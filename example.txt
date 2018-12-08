@@ -1,0 +1,185 @@
+Network Name: InceptionV1
+Input: inputs
+Number of Layers (in implementation): 255
+
+
+Parameters for Layer 1:
+Bottom: inputs
+Top: Conv2d_1a_7x7
+LR_MULT: 1
+decay_MULT: 1
+
+Parameters for Layer 2:
+Bottom: Conv2d_1a_7x7
+Top: Conv2d_1a_7x7
+
+Parameters for Layer 3:
+Bottom: Conv2d_1a_7x7
+Top: Conv2d_1a_7x7
+
+Parameters for Layer 4:
+Bottom: Conv2d_1a_7x7
+Top: Conv2d_1a_7x7
+
+Parameters for Layer 5:
+Bottom: Conv2d_1a_7x7
+Top: MaxPool_2a_3x3
+
+Parameters for Layer 6:
+Bottom: MaxPool_2a_3x3
+Top: Conv2d_2b_1x1
+LR_MULT: 1
+decay_MULT: 1
+
+Parameters for Layer 7:
+Bottom: Conv2d_2b_1x1
+Top: Conv2d_2b_1x1
+
+Parameters for Layer 8:
+Bottom: Conv2d_2b_1x1
+Top: Conv2d_2b_1x1
+
+Parameters for Layer 9:
+Bottom: Conv2d_2b_1x1
+Top: Conv2d_2b_1x1
+
+Parameters for Layer 10:
+Bottom: Conv2d_2b_1x1
+Top: Conv2d_2c_3x3
+LR_MULT: 1
+decay_MULT: 1
+
+Parameters for Layer 11:
+Bottom: Conv2d_2c_3x3
+Top: Conv2d_2c_3x3
+
+Parameters for Layer 12:
+Bottom: Conv2d_2c_3x3
+Top: Conv2d_2c_3x3
+
+Parameters for Layer 13:
+Bottom: Conv2d_2c_3x3
+Top: Conv2d_2c_3x3
+
+Parameters for Layer 14:
+Bottom: Conv2d_2c_3x3
+Top: MaxPool_3a_3x3
+
+Parameters for Layer 15:
+Bottom: MaxPool_3a_3x3
+Top: Mixed_3b/Branch_0/Conv2d_0a_1x1
+LR_MULT: 1
+decay_MULT: 1
+
+Parameters for Layer 16:
+Bottom: Mixed_3b/Branch_0/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_0/Conv2d_0a_1x1
+
+Parameters for Layer 17:
+Bottom: Mixed_3b/Branch_0/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_0/Conv2d_0a_1x1
+
+Parameters for Layer 18:
+Bottom: Mixed_3b/Branch_0/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_0/Conv2d_0a_1x1
+
+Parameters for Layer 19:
+Bottom: MaxPool_3a_3x3
+Top: Mixed_3b/Branch_1/Conv2d_0a_1x1
+LR_MULT: 1
+decay_MULT: 1
+
+Parameters for Layer 20:
+Bottom: Mixed_3b/Branch_1/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_1/Conv2d_0a_1x1
+
+Parameters for Layer 21:
+Bottom: Mixed_3b/Branch_1/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_1/Conv2d_0a_1x1
+
+Parameters for Layer 22:
+Bottom: Mixed_3b/Branch_1/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_1/Conv2d_0a_1x1
+
+Parameters for Layer 23:
+Bottom: Mixed_3b/Branch_1/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_1/Conv2d_0b_3x3
+LR_MULT: 1
+decay_MULT: 1
+
+Parameters for Layer 24:
+Bottom: Mixed_3b/Branch_1/Conv2d_0b_3x3
+Top: Mixed_3b/Branch_1/Conv2d_0b_3x3
+
+Parameters for Layer 25:
+Bottom: Mixed_3b/Branch_1/Conv2d_0b_3x3
+Top: Mixed_3b/Branch_1/Conv2d_0b_3x3
+
+Parameters for Layer 26:
+Bottom: Mixed_3b/Branch_1/Conv2d_0b_3x3
+Top: Mixed_3b/Branch_1/Conv2d_0b_3x3
+
+Parameters for Layer 27:
+Bottom: MaxPool_3a_3x3
+Top: Mixed_3b/Branch_2/Conv2d_0a_1x1
+LR_MULT: 1
+decay_MULT: 1
+
+Parameters for Layer 28:
+Bottom: Mixed_3b/Branch_2/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_2/Conv2d_0a_1x1
+
+Parameters for Layer 29:
+Bottom: Mixed_3b/Branch_2/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_2/Conv2d_0a_1x1
+
+Parameters for Layer 30:
+Bottom: Mixed_3b/Branch_2/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_2/Conv2d_0a_1x1
+
+Parameters for Layer 31:
+Bottom: Mixed_3b/Branch_2/Conv2d_0a_1x1
+Top: Mixed_3b/Branch_2/Conv2d_0b_3x3
+LR_MULT: 1
+decay_MULT: 1
+
+Parameters for Layer 32:
+Bottom: Mixed_3b/Branch_2/Conv2d_0b_3x3
+Top: Mixed_3b/Branch_2/Conv2d_0b_3x3
+
+Parameters for Layer 33:
+Bottom: Mixed_3b/Branch_2/Conv2d_0b_3x3
+Top: Mixed_3b/Branch_2/Conv2d_0b_3x3
+
+Parameters for Layer 34:
+Bottom: Mixed_3b/Branch_2/Conv2d_0b_3x3
+Top: Mixed_3b/Branch_2/Conv2d_0b_3x3
+
+Parameters for Layer 35:
+Bottom: MaxPool_3a_3x3
+Top: Mixed_3b/Branch_3/MaxPool_0a_3x3
+
+Parameters for Layer 36:
+Bottom: Mixed_3b/Branch_3/MaxPool_0a_3x3
+Top: Mixed_3b/Branch_3/Conv2d_0b_1x1
+LR_MULT: 1
+decay_MULT: 1
+
+Parameters for Layer 37:
+Bottom: Mixed_3b/Branch_3/Conv2d_0b_1x1
+Top: Mixed_3b/Branch_3/Conv2d_0b_1x1
+
+Parameters for Layer 38:
+Bottom: Mixed_3b/Branch_3/Conv2d_0b_1x1
+Top: Mixed_3b/Branch_3/Conv2d_0b_1x1
+
+Parameters for Layer 39:
+Bottom: Mixed_3b/Branch_3/Conv2d_0b_1x1
+Top: Mixed_3b/Branch_3/Conv2d_0b_1x1
+
+Parameters for Layer 40:
+Bottom: Mixed_3b/Branch_0/Conv2d_0a_1x1
+Bottom: Mixed_3b/Branch_1/Conv2d_0b_3x3
+Bottom: Mixed_3b/Branch_2/Conv2d_0b_3x3
+Bottom: Mixed_3b/Branch_3/Conv2d_0b_1x1
+Top: Mixed_3b

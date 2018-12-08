@@ -1,0 +1,60 @@
+end_point = 'Conv2d_1a_7x7'
+net = slim.Conv2d(inputs, 64,[7,7], stride=2, scope=end_point)
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_1a_7x7_bn'
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_1a_7x7_scale'
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_1a_7x7_relu'
+end_points[end_point] = net
+
+
+end_point = 'MaxPool_2a_3x3'
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_2b_1x1'
+net = slim.Conv2d(MaxPool_2a_3x3, 64,[1,1], stride=1, scope=end_point)
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_2b_1x1_bn'
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_2b_1x1_scale'
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_2b_1x1_relu'
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_2c_3x3'
+net = slim.Conv2d(Conv2d_2b_1x1, 192,[3,3], stride=1, scope=end_point)
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_2c_3x3_bn'
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_2c_3x3_scale'
+end_points[end_point] = net
+
+
+end_point = 'Conv2d_2c_3x3_relu'
+end_points[end_point] = net
+
+
+end_point = 'MaxPool_3a_3x3'
+end_points[end_point] = net
+
+
+end_point = 'Mixed_3b/Branch_0/Conv2d_0a_1x1'
