@@ -91,7 +91,38 @@ void general(caffe::LayerParameter lparam, int ind)
 	target<<space<<net<<endl;	
 	target<<space<< "end_points[end_point] = net" << endl;
 	target<<space<<endl<<endl;
-     
+}
+
+void mixed(caffe::LayerParameter lparam, int ind, string bottom)
+{
+	if((lparam.name().find("_bn") != std::string::npos)||(lparam.name().find("_scale") !=  std::string::npos) || (lparam.name().find("_relu") != std::string::npos))
+		return;
+	string end_point, net;
+	string space =indent(ind);
+	std::vector<std::string> result, conv_dim, inter;
+	result=split(lparam.name(),"/");
+	inter = split(result[2],"_");
+	//conv_name = inter[0];
+	conv_dim = split(inter[2],"x");
+
+	if (lparam.has_convolution_param())
+	{
+		int output = lparam.convolution_param().num_output();
+		int stride =lparam.convolution_param().stride()[0];
+		if (stride>1)		
+			net = result[1]+" = slim.conv2d("+bottom+", "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope="+result[2]+")";
+		else
+			net = result[1]+" = slim.conv2d("+bottom+", "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], scope="+result[2]+")";
+	}
+	if (lparam.has_pooling_param())
+	{
+		int stride =lparam.pooling_param().stride();
+		if (stride>1)		
+			net = result[1]+" = slim.max_pool2d("+bottom+", ["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope="+result[2]+")";
+		else
+			net = result[1]+" = slim.max_pool2d("+bottom+", ["+conv_dim[0]+","+conv_dim[1]+"], scope="+result[2]+")";
+	} 
+	target<<space<<net<<endl;	
 
 }
 
@@ -107,6 +138,7 @@ int main() {
 	ofstream myfile ("example.txt");
 
 	int ind=0;
+	std::string previous_endpoint, previous_branch;
 	string space =indent(ind);
 	target<<space<<"from __future__ import absolute_import"<<endl;
 	target<<space<<"from __future__ import division"<<endl;
@@ -201,19 +233,29 @@ int main() {
 
   
   else{
-	target<<"Parameters for Layer "<< nlayers + 1 << ":" << endl;
-	target<< "Name: " << lparam.name() << endl;
-	std::vector<std::string> result=split(lparam.name(),"/");
-	end_point = "end_point = \'"+result[0]+"\'";
-	target<<space<< end_point<<endl;	
-	target<<space<< "with tf.variable_scope(end_point):"<<endl;
-	space=indent(++ind);
-	target<<space<< "with tf.variable_scope(\'"+result[1]+"\'):"<<endl;
-	space=indent(++ind);
-	
-	
-
-	
+	string end_point, bottom;
+	std::vector<std::string> result;
+	result=split(lparam.name(),"/");
+	bottom=result[1];
+	if (previous_endpoint.empty())
+	{
+		//current=result[0];
+		end_point = "end_point = \'"+result[0]+"\'";	
+		target<<space<< end_point<<endl;	
+		target<<space<< "with tf.variable_scope(end_point):"<<endl;
+		space=indent(++ind);
+	}
+	if (previous_branch.empty() || previous_branch != result[1])
+	{
+		target<<space<< "with tf.variable_scope(\'"+result[1]+"\'):"<<endl;
+		//space=indent(ind+1);
+		bottom="net";
+	}
+	mixed(lparam,ind+1,bottom);
+	previous_endpoint = result[0];
+	previous_branch = result[1];
+	//net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+	target<<space<< "end_points[end_point] = net"<<endl;
   }
  } 
   delete input;
