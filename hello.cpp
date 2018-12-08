@@ -22,7 +22,7 @@ using google::protobuf::io::CodedInputStream;
 using google::protobuf::io::ZeroCopyOutputStream;
 using google::protobuf::io::CodedOutputStream;
 using google::protobuf::Message;
-
+ofstream target ("inception_v1_simple.py");
 //used to split a string into tokens depending on delimiter
 vector<string> split(string str, string token){
     vector<string>result;
@@ -55,6 +55,46 @@ string indent(int loop){
 return space;
 }
 
+
+void general(caffe::LayerParameter lparam, int ind)
+{
+	string conv_name,end_point,net;
+	string space =indent(ind);
+	std::vector<std::string> result,conv_dim;	
+
+	end_point = "end_point = \'"+lparam.name()+"\'";
+	result=split(lparam.name(),"_");
+	conv_name = result[0];
+	conv_dim = split(result[2],"x");
+    
+	if (lparam.has_convolution_param()) 
+	{
+		int output = lparam.convolution_param().num_output();
+		int stride =lparam.convolution_param().stride()[0];
+		//need to figure out the first parameter
+		if (stride>1)
+			net = "net = slim.conv2d(net, "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
+		else
+			net = "net = slim.conv2d(net, "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], scope=end_point)";
+	}
+	     
+
+	if (lparam.has_pooling_param()) 
+	{
+		int stride = lparam.pooling_param().stride();
+		net = "net = slim.max_pool2d(net, ["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
+	}
+	if((lparam.name().find("_bn") != std::string::npos)||(lparam.name().find("_scale") !=  std::string::npos) || (lparam.name().find("_relu") != std::string::npos))
+		return;
+		
+	target<<space<< end_point<<endl;	
+	target<<space<<net<<endl;	
+	target<<space<< "end_points[end_point] = net" << endl;
+	target<<space<<endl<<endl;
+     
+
+}
+
 int main() {
 	  caffe::NetParameter param;
 	  caffe::LayerParameter lparam;
@@ -65,7 +105,7 @@ int main() {
 	  google::protobuf::io::FileInputStream* input = new google::protobuf::io::FileInputStream(fd);
 	  bool success = google::protobuf::TextFormat::Parse(input, &param);
 	ofstream myfile ("example.txt");
-	ofstream target ("inception_v1_simple.py");
+
 	int ind=0;
 	string space =indent(ind);
 	target<<space<<"from __future__ import absolute_import"<<endl;
@@ -99,10 +139,9 @@ int main() {
 	  myfile << "Number of Layers (in implementation): " << param.layer_size() << endl << endl;
 	  for (int nlayers = 0; nlayers < param.layer_size(); nlayers++) 
 	  {
-	    string net, end_point, conv_name, bottom;
 
-	    std::vector<std::string> conv_dim;
 	    lparam = param.layer(nlayers);
+/*
 	    //cout<<"Parameters for Layer "<< nlayers + 1 << ":" << endl;
 	    myfile << endl << "Parameters for Layer "<< nlayers + 1 << ":" << endl;	 
 
@@ -118,23 +157,14 @@ int main() {
       myfile << "decay_MULT: " << lparam.param(i).decay_mult() << endl;
     }
 
-
+*/
 	if ((lparam.name().find("Mixed") != std::string::npos)==false)
 	{
-	end_point = "end_point = \'"+lparam.name()+"\'";
-	std::vector<std::string> result;	
-	result=split(lparam.name(),"_");
-	conv_name = result[0];
-	conv_dim = split(result[2],"x");
-		
-	
-    
+		general(lparam,ind);
+/*
 	  if (lparam.has_convolution_param()) 
 	  {
 	      //myfile << "Number of Outputs: " << lparam.convolution_param().num_output() << endl;
-		int output = lparam.convolution_param().num_output();
-		int stride =lparam.convolution_param().stride()[0];
-		net = "net = slim.conv2d("+bottom+", "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
 		
 		if (lparam.name()== "Logits/Conv2d_0c_1x1")
 			cout<<"num_classes: "<< lparam.convolution_param().num_output() << endl;
@@ -154,11 +184,9 @@ int main() {
 	      cout << "Beta: " << lparam.lrn_param().beta() << endl;
 	    }
 	    if (lparam.has_pooling_param()) {
-	      cout << "Pool: " << lparam.pooling_param().pool() << endl;
-	      cout << "Kernel Size: " << lparam.pooling_param().kernel_size() << endl;
-	      cout << "Stride: " << lparam.pooling_param().stride() << endl;
-		int stride = lparam.pooling_param().stride();
-		net = "net = slim.max_pool2d("+bottom+", "+"["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
+	      //cout << "Pool: " << lparam.pooling_param().pool() << endl;
+	      //cout << "Kernel Size: " << lparam.pooling_param().kernel_size() << endl;
+	      //cout << "Stride: " << lparam.pooling_param().stride() << endl;
 	    }
 	    if (lparam.has_inner_product_param()) {
 	      myfile << "Number of Outputs: " << lparam.inner_product_param().num_output() << endl;
@@ -166,20 +194,15 @@ int main() {
 	    if (lparam.has_dropout_param()) {
 	      myfile << "Dropout Ratio: " << lparam.dropout_param().dropout_ratio() << endl;
 	    }
-		if((lparam.name().find("_bn") != std::string::npos)||(lparam.name().find("_scale") !=  std::string::npos) || (lparam.name().find("_relu") != std::string::npos))
-			continue;
-		
-		target<<space<< end_point<<endl;	
-		target<<space<<net<<endl;	
-		target<<space<< "end_points[end_point] = net" << endl;
-		target<<space<<endl<<endl;
+
+*/
 	   }
 
 
   
   else{
-target<<"Parameters for Layer "<< nlayers + 1 << ":" << endl;
-target<< "Name: " << lparam.name() << endl;
+	target<<"Parameters for Layer "<< nlayers + 1 << ":" << endl;
+	target<< "Name: " << lparam.name() << endl;
 	std::vector<std::string> result=split(lparam.name(),"/");
 	end_point = "end_point = \'"+result[0]+"\'";
 	target<<space<< end_point<<endl;	
