@@ -55,8 +55,10 @@ return space;
 }
 
 //used to print general layers
-void general(caffe::LayerParameter lparam, int ind)
+void general(caffe::LayerParameter lparam, int ind, string bottom)
 {
+	if((lparam.name().find("_bn") != std::string::npos)||(lparam.name().find("_scale") !=  std::string::npos) || (lparam.name().find("_relu") != std::string::npos))
+		return;
 	string conv_name,end_point,net, slim;
 	string space =indent(ind);
 	std::vector<std::string> result,conv_dim;	
@@ -72,9 +74,9 @@ void general(caffe::LayerParameter lparam, int ind)
 		int stride =lparam.convolution_param().stride()[0];
 		//need to figure out the first parameter
 		if (stride>1)
-			net = "net = slim.conv2d(net, "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
+			net = "net = slim.conv2d("+bottom+", "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
 		else
-			net = "net = slim.conv2d(net, "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], scope=end_point)";
+			net = "net = slim.conv2d("+bottom+", "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], scope=end_point)";
 	}
 	     
 
@@ -85,10 +87,8 @@ void general(caffe::LayerParameter lparam, int ind)
 			slim = "slim.avg_pool2d";
 		else
 			slim = "slim.max_pool2d";
-		net = "net = "+ slim +"(net, ["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
+		net = "net = "+ slim +"("+bottom+", ["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
 	}
-	if((lparam.name().find("_bn") != std::string::npos)||(lparam.name().find("_scale") !=  std::string::npos) || (lparam.name().find("_relu") != std::string::npos))
-		return;
 		
 	target<<space<< end_point<<endl;	
 	target<<space<<net<<endl;	
@@ -142,7 +142,7 @@ target<<space<< "weight_decay=0.00004,"<<endl;
 target<<space<< "use_batch_norm=True,"<<endl;
 target<<space<< "batch_norm_decay=0.9997,"<<endl;
 target<<space<< "batch_norm_epsilon=0.001,"<<endl;
-target<<space<< "batch_norm_updates_collections=tf.GraphKeys.UPDATE_OPS):"<<endl;
+target<<space<< "batch_norm_updates_collections=tf.GraphKeys.UPDATE_OPS):"<<endl<<endl;
 
 space=indent(++ind);
 target<<space<< "batch_norm_params = {"<<endl;
@@ -201,7 +201,7 @@ int main() {
 	ofstream myfile ("example.txt");
 
 	int ind=0, axis, j;
-	std::string previous_endpoint, previous_branch, values, logit_endpoint;
+	std::string previous_endpoint, previous_branch, values, logit_endpoint, gen_bottom;
 	string space =indent(ind);
 	target<<space<<"from __future__ import absolute_import"<<endl;
 	target<<space<<"from __future__ import division"<<endl;
@@ -212,6 +212,7 @@ int main() {
 	target<<space<<"slim = tf.contrib.slim"<<endl<<endl;
 	  cout << "Network Name: " << param.name() << endl;
 	  cout << "Input: " << param.input(0) << endl;
+	gen_bottom=param.input(0);
 //	cout<< "Input dim size: "<<param.input_dim_size()<<endl;
 //	cout<< "Input shape: "<<param.input_shape()<<endl;
 
@@ -322,15 +323,17 @@ int main() {
 			space=indent(--ind);
 			target<<space<< "end_points[\'Predictions\'] = slim."+lparam.type()+"(logits, scope=\'Predictions\')"<<endl;
 			space=indent(--ind);
-			target<<space<< "return logits, end_points"<<endl;
+			target<<space<< "return logits, end_points"<<endl<<endl;
 			space=indent(--ind);
+			target<<space<< param.name()<<".default_image_size = 224"<<endl<<endl<<endl;			
 			//target<<space<< param.name()<<".default_image_size = "<<param.input_dim(2)<<endl;
 			end_code();
 		
 		}
 		else 
 		{
-			general(lparam,ind);
+			general(lparam,ind,gen_bottom);
+			gen_bottom="net";
 
 		}
  

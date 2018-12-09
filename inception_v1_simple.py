@@ -19,7 +19,7 @@ def InceptionV1(inputs,
          end_points = {}
 
          end_point = 'Conv2d_1a_7x7'
-         net = slim.conv2d(net, 64, [7,7], stride=2, scope=end_point)
+         net = slim.conv2d(inputs, 64, [7,7], stride=2, scope=end_point)
          end_points[end_point] = net
          
 
@@ -229,12 +229,17 @@ def InceptionV1(inputs,
             end_points[end_point] = logits
          end_points['Predictions'] = slim.Softmax(logits, scope='Predictions')
       return logits, end_points
+
+   InceptionV1.default_image_size = 224
+
+
 def default_arg_scope(is_training=True, 
                weight_decay=0.00004,
                use_batch_norm=True,
                batch_norm_decay=0.9997,
                batch_norm_epsilon=0.001,
                batch_norm_updates_collections=tf.GraphKeys.UPDATE_OPS):
+
    batch_norm_params = {
       'decay': batch_norm_decay,
       'epsilon': batch_norm_epsilon,
