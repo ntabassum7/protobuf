@@ -54,40 +54,53 @@ string indent(int loop){
 return space;
 }
 
-//used to print general layers
-void general(caffe::LayerParameter lparam, int ind, string bottom)
+int find_class(caffe::NetParameter param)
 {
-	if((lparam.name().find("_bn") != std::string::npos)||(lparam.name().find("_scale") !=  std::string::npos) || (lparam.name().find("_relu") != std::string::npos))
+	caffe::LayerParameter lparam;
+	for (int nlayers=0; nlayers < param.layer_size(); nlayers++) 
+	{
+		lparam = param.layer(nlayers);
+		if(lparam.name()=="Logits/Conv2d_0c_1x1")
+			return lparam.convolution_param().num_output();
+	}
+	return 1000;
+		
+}
+
+//used to print general layers
+void general(caffe::LayerParameter lparam, int ind, string ep)
+{
+	if((lparam.type() == "BatchNorm")||(lparam.type() == "Scale") || (lparam.type() == "ReLU"))
 		return;
-	string conv_name,end_point,net, slim;
+
+	string conv_name,end_point,net, slim, conv_dim;
 	string space =indent(ind);
-	std::vector<std::string> result,conv_dim;	
 
 	end_point = "end_point = \'"+lparam.name()+"\'";
-	result=split(lparam.name(),"_");
-	conv_name = result[0];
-	conv_dim = split(result[2],"x");
-    
+
 	if (lparam.has_convolution_param()) 
 	{
 		int output = lparam.convolution_param().num_output();
 		int stride =lparam.convolution_param().stride()[0];
-		//need to figure out the first parameter
+		conv_dim = std::to_string(lparam.convolution_param().kernel_size()[0]);
+
 		if (stride>1)
-			net = "net = slim.conv2d("+bottom+", "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
+			net = "net = slim.conv2d("+ep+", "+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope=end_point)";
 		else
-			net = "net = slim.conv2d("+bottom+", "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], scope=end_point)";
+			net = "net = slim.conv2d("+ep+", "+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], scope=end_point)";
 	}
 	     
 
 	if (lparam.has_pooling_param()) 
 	{
 		int stride = lparam.pooling_param().stride();
-		if (result[0]=="AvgPool")
-			slim = "slim.avg_pool2d";
+		conv_dim = std::to_string(lparam.pooling_param().kernel_size());
+
+		if(lparam.pooling_param().has_global_pooling())
+			slim = "slim.avg_pool2d";		
 		else
 			slim = "slim.max_pool2d";
-		net = "net = "+ slim +"("+bottom+", ["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope=end_point)";
+		net = "net = "+ slim +"("+ep+", ["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope=end_point)";
 	}
 		
 	target<<space<< end_point<<endl;	
@@ -97,34 +110,38 @@ void general(caffe::LayerParameter lparam, int ind, string bottom)
 }
 
 //used to print mixed layers
-void mixed(caffe::LayerParameter lparam, int ind, string bottom)
+void mixed(caffe::LayerParameter lparam, int ind, string ep, string b_num)
 {
-	if((lparam.name().find("_bn") != std::string::npos)||(lparam.name().find("_scale") !=  std::string::npos) || (lparam.name().find("_relu") != std::string::npos))
+	if((lparam.type() == "BatchNorm")||(lparam.type() == "Scale") || (lparam.type() == "ReLU"))
 		return;
-	string end_point, net;
+	string end_point, net, conv_dim, name=lparam.name();
 	string space =indent(ind);
-	std::vector<std::string> result, conv_dim, inter;
-	result=split(lparam.name(),"/");
-	inter = split(result[2],"_");
-	//conv_name = inter[0];
-	conv_dim = split(inter[2],"x");
+	std::vector<std::string> result;
+	if (lparam.name().find("/")!=string::npos)
+	{
+		result=split(lparam.name(),"/");
+		name = result[2];	
+	}
+
 
 	if (lparam.has_convolution_param())
 	{
 		int output = lparam.convolution_param().num_output();
 		int stride =lparam.convolution_param().stride()[0];
+		conv_dim = std::to_string(lparam.convolution_param().kernel_size()[0]);
 		if (stride>1)		
-			net = result[1]+" = slim.conv2d("+bottom+", "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope="+result[2]+")";
+			net = b_num+" = slim.conv2d("+ep+", "+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope="+name+")";
 		else
-			net = result[1]+" = slim.conv2d("+bottom+", "+std::to_string(output)+", "+"["+conv_dim[0]+","+conv_dim[1]+"], scope="+result[2]+")";
+			net = b_num+" = slim.conv2d("+ep+", "+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], scope="+name+")";
 	}
 	if (lparam.has_pooling_param())
 	{
+		conv_dim = std::to_string(lparam.pooling_param().kernel_size());
 		int stride =lparam.pooling_param().stride();
 		if (stride>1)		
-			net = result[1]+" = slim.max_pool2d("+bottom+", ["+conv_dim[0]+","+conv_dim[1]+"], stride="+std::to_string(stride)+", scope="+result[2]+")";
+			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope="+name+")";
 		else
-			net = result[1]+" = slim.max_pool2d("+bottom+", ["+conv_dim[0]+","+conv_dim[1]+"], scope="+result[2]+")";
+			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], scope="+name+")";
 	} 
 	target<<space<<net<<endl;	
 
@@ -189,157 +206,196 @@ target<<space<< "return sc"<<endl;
 
 }
 
+int check_branch(caffe::NetParameter param, int nlayers, string name)
+{
+	caffe::LayerParameter lparam;
+	int count = 0, flag=0;
+	for (; nlayers < param.layer_size(); nlayers++) 
+	{
+		lparam = param.layer(nlayers);
+
+		if((lparam.type() == "BatchNorm")||(lparam.type() == "Scale") || (lparam.type() == "ReLU"))
+			continue;
+		if (name==lparam.bottom()[0])
+			count++;
+	}
+
+	if (count>1)
+		flag=1;
+	return flag;
+}
+
+void dropout(caffe::LayerParameter lparam, int ind)
+{
+	std::vector<std::string> result;
+	string conv_dim, space, name=lparam.name();
+	
+	if (lparam.name().find("/")!=string::npos)
+	{
+		result=split(lparam.name(),"/");
+		name = result[1];	
+	}
+	
+	if (lparam.has_dropout_param())
+	{
+		space=indent(ind);	
+		target<<space<< "end_point = 'Logits'"<<endl;
+		target<<space<< "with tf.variable_scope(end_point):"<<endl;
+		space=indent(++ind);
+		stringstream stream;
+		stream << fixed << setprecision(1) << 1-lparam.dropout_param().dropout_ratio();
+		string s = stream.str();
+		target<<space<< std::fixed << std::setprecision(1)<< "net = slim.dropout(net, "+s+", scope=\'"+name+"\')"<<endl;
+	}
+	if (lparam.has_convolution_param())
+	{
+		space=indent(++ind);	
+		conv_dim = std::to_string(lparam.convolution_param().kernel_size()[0]);
+	        target<<space<< "logits = slim.conv2d(net, num_classes, ["+conv_dim+","+conv_dim+"], activation_fn=None,"<<endl;
+		space=indent(ind+7);
+		target<<space<< "normalizer_fn=None, scope=\'"+name+"\')"<<endl;
+		space=indent(ind);
+		target<<space<< "logits = tf.squeeze(logits, [1, 2], name=\'SpatialSqueeze\')"<<endl;
+		target<<space<< "end_points[end_point] = logits"<<endl;
+	}
+}
+
+string find_concat(caffe::NetParameter param, int nlayers, string name)
+{
+	caffe::LayerParameter lparam;
+	int flag=0;
+	for (; nlayers < param.layer_size(); nlayers++) 
+	{
+		lparam = param.layer(nlayers);
+
+		if(lparam.type() != "Concat")
+			continue;
+		for(int i=0;i<lparam.bottom_size();i++)
+			if(name==lparam.bottom()[i])
+				return lparam.name();
+	}
+	return name;
+}
+
 int main() {
 	  caffe::NetParameter param;
-	  caffe::LayerParameter lparam;
+	  caffe::LayerParameter lparam, oldparam;
 	  const char * filename = "inception_v1.prototxt";
 	  int fd = open(filename, O_RDONLY);
 	  if (fd == -1)
 	  cout << "File not found: " << filename;
 	  google::protobuf::io::FileInputStream* input = new google::protobuf::io::FileInputStream(fd);
 	  bool success = google::protobuf::TextFormat::Parse(input, &param);
-	ofstream myfile ("example.txt");
 
-	int ind=0, axis, j;
-	std::string previous_endpoint, previous_branch, values, logit_endpoint, gen_bottom;
+	int ind=0, axis=0, j, branch=0, num_classes;
+	std::string oldbottom, previous_endpoint, previous_branch, values, gen_ep, br_concat;
 	string space =indent(ind);
 	target<<space<<"from __future__ import absolute_import"<<endl;
 	target<<space<<"from __future__ import division"<<endl;
 	target<<space<<"from __future__ import print_function"<<endl<<endl;
-
 	target<<space<<"import tensorflow as tf"<<endl<<endl;
-
 	target<<space<<"slim = tf.contrib.slim"<<endl<<endl;
-	  cout << "Network Name: " << param.name() << endl;
-	  cout << "Input: " << param.input(0) << endl;
-	gen_bottom=param.input(0);
-//	cout<< "Input dim size: "<<param.input_dim_size()<<endl;
-//	cout<< "Input shape: "<<param.input_shape()<<endl;
+	
+	gen_ep=param.input(0);
+	num_classes = find_class(param);
 
-	  for (j = 0; j < param.input_dim_size(); j++); 
-	  {
-//	    cout << "Input Dim "<< j << ": " << param.input_dim(j) << endl;
-	  }
+	//printing the header part of the target code
+	target<<space<<"def "+param.name()+"("+param.input(0)+","<<endl;
+	space=indent(ind+5);
+        target<<space<< "num_classes="<<std::to_string(num_classes)<<","<<endl;
+        target<<space<< "is_training=True,"<<endl;
+        target<<space<< "reuse=None,"<<endl;
+        target<<space<< "scope=\'"+param.name()+"\'):"<<endl<<endl<<endl;
+	space=indent(++ind);
+	target<<space<< "with tf.variable_scope(scope, \"Model\", reuse=reuse):"<<endl;
+	space=indent(++ind);
+	target<<space<< "with slim.arg_scope(default_arg_scope(is_training)):"<<endl<<endl;
+	space=indent(++ind);
+	target<<space<< "end_points = {}"<<endl<<endl;
 
+	for (int nlayers = 0; nlayers < param.layer_size(); nlayers++) 
+	{
 
-		//printing the header part of the target code
-		target<<space<<"def "+param.name()+"("+param.input(0)+","<<endl;
-		space=indent(ind+5);
-                target<<space<< "num_classes=1000,"<<endl;
-                target<<space<< "is_training=True,"<<endl;
-                target<<space<< "reuse=None,"<<endl;
-                target<<space<< "scope=\'"+param.name()+"\'):"<<endl<<endl<<endl;
-		space=indent(++ind);
-		target<<space<< "with tf.variable_scope(scope, \"Model\", reuse=reuse):"<<endl;
-		space=indent(++ind);
-		target<<space<< "with slim.arg_scope(default_arg_scope(is_training)):"<<endl<<endl;
-		space=indent(++ind);
-		target<<space<< "end_points = {}"<<endl<<endl;
-
-
-	  myfile << "Number of Layers (in implementation): " << param.layer_size() << endl << endl;
-	  for (int nlayers = 0; nlayers < param.layer_size(); nlayers++) 
-	  {
-
-	    lparam = param.layer(nlayers);
-
-		if ((lparam.name().find("Mixed") != std::string::npos))
+		lparam = param.layer(nlayers);
+		if((lparam.type() == "BatchNorm")||(lparam.type() == "Scale") || (lparam.type() == "ReLU"))
+			continue;
+		else if (lparam.type()== "Dropout")
 		{
-			//cout << "Name: " << lparam.name() << endl;
-			string end_point, bottom;
-			std::vector<std::string> result;
-			if (lparam.type()=="Concat")
-			{
-				values = values + "])";
-				target<<space<< "net = tf.concat("<<endl;
-				space=indent(ind+1);
-				target<<space<<"axis="+std::to_string(axis-1)+", "+values<<endl;
-				space=indent(--ind);
-				target<<space<< "end_points[end_point] = net"<<endl<<endl<<endl;
-			}
-			else
-			{
-				result=split(lparam.name(),"/");
-				bottom=result[1];
-				if (previous_endpoint.empty() || previous_endpoint != result[0])
-				{		
-					axis= 0;
-					values = "values=["+ result[1];
-					end_point = "end_point = \'"+result[0]+"\'";	
-					target<<space<< end_point<<endl;	
-					target<<space<< "with tf.variable_scope(end_point):"<<endl;
-					space=indent(++ind);
-				}
-				if (previous_branch.empty() || previous_branch != result[1])
-				{
-					target<<space<< "with tf.variable_scope(\'"+result[1]+"\'):"<<endl;
-					//space=indent(ind+1);
-					bottom="net";
-					if (axis>0)
-						values = values + ", " + result[1];
-					axis++;
-				}
-				mixed(lparam,ind+1,bottom);
-				previous_endpoint = result[0];
-				previous_branch = result[1];
-			}	
-	  	}
-		else if ((lparam.name().find("Logits") != std::string::npos))
-		{
-			std::vector<std::string> result, inter, conv_dim;
-			result=split(lparam.name(),"/");
-			
-//			bottom=result[1];
-			if (logit_endpoint.empty())
-			{
-				target<<space<< "end_point = 'Logits'"<<endl;
-				target<<space<< "with tf.variable_scope(end_point):"<<endl;
-				space=indent(++ind);
-				logit_endpoint = "flag";
-			}
-			if (lparam.has_dropout_param())
-			{
-//				std::setprecision(1);
-//				target  << endl;
-				stringstream stream;
-				stream << fixed << setprecision(1) << 1-lparam.dropout_param().dropout_ratio();
-				string s = stream.str();
-				target<<space<< std::fixed << std::setprecision(1)<< "net = slim.dropout(net, "+s+", scope=\'"+result[1]+"\')"<<endl;
-			}
-			if (lparam.has_convolution_param())
-			{
-				inter = split(result[1],"_");
-				conv_dim = split(inter[2],"x");
-			        target<<space<< "logits = slim.conv2d(net, num_classes, ["+conv_dim[0]+","+conv_dim[1]+"], activation_fn=None,"<<endl;
-				space=indent(ind+7);
-				target<<space<< "normalizer_fn=None, scope=\'"+result[1]+"\')"<<endl;
-			}
+			branch = 2;
+			dropout(lparam,ind);
 		}
-		else if (lparam.name()=="Predictions")
+		else if (lparam.type()=="Softmax")
 		{
-			space=indent(ind);
-			target<<space<< "logits = tf.squeeze(logits, [1, 2], name=\'SpatialSqueeze\')"<<endl;
-        		target<<space<< "end_points[end_point] = logits"<<endl;
-			space=indent(--ind);
 			target<<space<< "end_points[\'Predictions\'] = slim."+lparam.type()+"(logits, scope=\'Predictions\')"<<endl;
 			space=indent(--ind);
 			target<<space<< "return logits, end_points"<<endl<<endl;
-			space=indent(--ind);
-			target<<space<< param.name()<<".default_image_size = 224"<<endl<<endl<<endl;			
-			//target<<space<< param.name()<<".default_image_size = "<<param.input_dim(2)<<endl;
+			space=indent(--ind);	
+			target<<space<< param.name()<<".default_image_size = "<<param.input_shape()[0].dim()[2]<<endl<<endl<<endl;
 			end_code();
-		
 		}
-		else 
+		else
 		{
-			general(lparam,ind,gen_bottom);
-			gen_bottom="net";
+			if (branch==0)
+			{
+				general(lparam,ind,gen_ep);
+				gen_ep="net";
+				branch=check_branch(param, nlayers, lparam.name());
+			}
 
+			else if (branch==1)
+			{
+				string end_point, ep_send, current_branch, b_num;
+				std::vector<std::string> result;
+				if (lparam.type()=="Concat")
+				{
+					br_concat="";
+					values = values + "])";
+					target<<space<< "net = tf.concat("<<endl;
+					space=indent(ind+1);
+					target<<space<<"axis="+std::to_string(axis-1)+", "+values<<endl;
+					space=indent(--ind);
+					target<<space<< "end_points[end_point] = net"<<endl<<endl<<endl;
+					branch=check_branch(param, nlayers, lparam.name());
+				}
+				else
+				{
+					if (br_concat.empty())
+						br_concat=find_concat(param, nlayers, lparam.name());
+					result=split(lparam.name(),"/");
+					b_num=ep_send="branch_"+ std::to_string(axis-1);
+					if (previous_endpoint.empty() || previous_endpoint != br_concat)
+					{		
+						axis= 0;
+						values = "values=[branch_"+ std::to_string(axis);
+						b_num=ep_send=current_branch="branch_"+ std::to_string(axis);
+						end_point = "end_point = \'"+br_concat+"\'";	
+						target<<space<< end_point<<endl;	
+						target<<space<< "with tf.variable_scope(end_point):"<<endl;
+						space=indent(++ind);
+					}
+					
+					if (oldparam.name()!=lparam.bottom()[0])
+					{
+						
+						ep_send="net";
+						if (axis>0)
+							values = values + ", branch_" + std::to_string(axis);
+						b_num=current_branch = "branch_"+std::to_string(axis);
+						target<<space<< "with tf.variable_scope(\'"+current_branch+"\'):"<<endl;
+						axis++;
+					}
+					mixed(lparam,ind+1,ep_send,b_num);
+					previous_endpoint = br_concat;
+					oldparam = lparam;
+				}	
+		  	}
+			else if (branch==2)
+				dropout(lparam,ind);
 		}
- 
- 	} 
-  delete input;
-  //close(fd);*/
+
+	}
+delete input;
+//close(fd);*/
    
    
 return 0;

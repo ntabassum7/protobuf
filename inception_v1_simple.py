@@ -45,37 +45,37 @@ def InceptionV1(inputs,
 
          end_point = 'Mixed_3b'
          with tf.variable_scope(end_point):
-            with tf.variable_scope('Branch_0'):
-               Branch_0 = slim.conv2d(net, 64, [1,1], scope=Conv2d_0a_1x1)
-            with tf.variable_scope('Branch_1'):
-               Branch_1 = slim.conv2d(net, 96, [1,1], scope=Conv2d_0a_1x1)
-               Branch_1 = slim.conv2d(Branch_1, 128, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_2'):
-               Branch_2 = slim.conv2d(net, 16, [1,1], scope=Conv2d_0a_1x1)
-               Branch_2 = slim.conv2d(Branch_2, 32, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_3'):
-               Branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
-               Branch_3 = slim.conv2d(Branch_3, 32, [1,1], scope=Conv2d_0b_1x1)
+            with tf.variable_scope('branch_0'):
+               branch_0 = slim.conv2d(net, 64, [1,1], scope=Conv2d_0a_1x1)
+            with tf.variable_scope('branch_1'):
+               branch_1 = slim.conv2d(net, 96, [1,1], scope=Conv2d_0a_1x1)
+               branch_1 = slim.conv2d(branch_1, 128, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_2'):
+               branch_2 = slim.conv2d(net, 16, [1,1], scope=Conv2d_0a_1x1)
+               branch_2 = slim.conv2d(branch_2, 32, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_3'):
+               branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
+               branch_3 = slim.conv2d(branch_3, 32, [1,1], scope=Conv2d_0b_1x1)
             net = tf.concat(
-               axis=3, values=[Branch_0, Branch_1, Branch_2, Branch_3])
+               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
          end_points[end_point] = net
 
 
          end_point = 'Mixed_3c'
          with tf.variable_scope(end_point):
-            with tf.variable_scope('Branch_0'):
-               Branch_0 = slim.conv2d(net, 128, [1,1], scope=Conv2d_0a_1x1)
-            with tf.variable_scope('Branch_1'):
-               Branch_1 = slim.conv2d(net, 128, [1,1], scope=Conv2d_0a_1x1)
-               Branch_1 = slim.conv2d(Branch_1, 192, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_2'):
-               Branch_2 = slim.conv2d(net, 32, [1,1], scope=Conv2d_0a_1x1)
-               Branch_2 = slim.conv2d(Branch_2, 96, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_3'):
-               Branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
-               Branch_3 = slim.conv2d(Branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
+            with tf.variable_scope('branch_0'):
+               branch_0 = slim.conv2d(net, 128, [1,1], scope=Conv2d_0a_1x1)
+            with tf.variable_scope('branch_1'):
+               branch_1 = slim.conv2d(net, 128, [1,1], scope=Conv2d_0a_1x1)
+               branch_1 = slim.conv2d(branch_1, 192, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_2'):
+               branch_2 = slim.conv2d(net, 32, [1,1], scope=Conv2d_0a_1x1)
+               branch_2 = slim.conv2d(branch_2, 96, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_3'):
+               branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
+               branch_3 = slim.conv2d(branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
             net = tf.concat(
-               axis=3, values=[Branch_0, Branch_1, Branch_2, Branch_3])
+               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
          end_points[end_point] = net
 
 
@@ -86,137 +86,137 @@ def InceptionV1(inputs,
 
          end_point = 'Mixed_4b'
          with tf.variable_scope(end_point):
-            with tf.variable_scope('Branch_0'):
-               Branch_0 = slim.conv2d(net, 192, [1,1], scope=Conv2d_0a_1x1)
-            with tf.variable_scope('Branch_1'):
-               Branch_1 = slim.conv2d(net, 96, [1,1], scope=Conv2d_0a_1x1)
-               Branch_1 = slim.conv2d(Branch_1, 208, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_2'):
-               Branch_2 = slim.conv2d(net, 16, [1,1], scope=Conv2d_0a_1x1)
-               Branch_2 = slim.conv2d(Branch_2, 48, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_3'):
-               Branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
-               Branch_3 = slim.conv2d(Branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
+            with tf.variable_scope('branch_0'):
+               branch_0 = slim.conv2d(net, 192, [1,1], scope=Conv2d_0a_1x1)
+            with tf.variable_scope('branch_1'):
+               branch_1 = slim.conv2d(net, 96, [1,1], scope=Conv2d_0a_1x1)
+               branch_1 = slim.conv2d(branch_1, 208, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_2'):
+               branch_2 = slim.conv2d(net, 16, [1,1], scope=Conv2d_0a_1x1)
+               branch_2 = slim.conv2d(branch_2, 48, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_3'):
+               branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
+               branch_3 = slim.conv2d(branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
             net = tf.concat(
-               axis=3, values=[Branch_0, Branch_1, Branch_2, Branch_3])
+               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
          end_points[end_point] = net
 
 
          end_point = 'Mixed_4c'
          with tf.variable_scope(end_point):
-            with tf.variable_scope('Branch_0'):
-               Branch_0 = slim.conv2d(net, 160, [1,1], scope=Conv2d_0a_1x1)
-            with tf.variable_scope('Branch_1'):
-               Branch_1 = slim.conv2d(net, 112, [1,1], scope=Conv2d_0a_1x1)
-               Branch_1 = slim.conv2d(Branch_1, 224, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_2'):
-               Branch_2 = slim.conv2d(net, 24, [1,1], scope=Conv2d_0a_1x1)
-               Branch_2 = slim.conv2d(Branch_2, 64, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_3'):
-               Branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
-               Branch_3 = slim.conv2d(Branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
+            with tf.variable_scope('branch_0'):
+               branch_0 = slim.conv2d(net, 160, [1,1], scope=Conv2d_0a_1x1)
+            with tf.variable_scope('branch_1'):
+               branch_1 = slim.conv2d(net, 112, [1,1], scope=Conv2d_0a_1x1)
+               branch_1 = slim.conv2d(branch_1, 224, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_2'):
+               branch_2 = slim.conv2d(net, 24, [1,1], scope=Conv2d_0a_1x1)
+               branch_2 = slim.conv2d(branch_2, 64, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_3'):
+               branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
+               branch_3 = slim.conv2d(branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
             net = tf.concat(
-               axis=3, values=[Branch_0, Branch_1, Branch_2, Branch_3])
+               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
          end_points[end_point] = net
 
 
          end_point = 'Mixed_4d'
          with tf.variable_scope(end_point):
-            with tf.variable_scope('Branch_0'):
-               Branch_0 = slim.conv2d(net, 128, [1,1], scope=Conv2d_0a_1x1)
-            with tf.variable_scope('Branch_1'):
-               Branch_1 = slim.conv2d(net, 128, [1,1], scope=Conv2d_0a_1x1)
-               Branch_1 = slim.conv2d(Branch_1, 256, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_2'):
-               Branch_2 = slim.conv2d(net, 24, [1,1], scope=Conv2d_0a_1x1)
-               Branch_2 = slim.conv2d(Branch_2, 64, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_3'):
-               Branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
-               Branch_3 = slim.conv2d(Branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
+            with tf.variable_scope('branch_0'):
+               branch_0 = slim.conv2d(net, 128, [1,1], scope=Conv2d_0a_1x1)
+            with tf.variable_scope('branch_1'):
+               branch_1 = slim.conv2d(net, 128, [1,1], scope=Conv2d_0a_1x1)
+               branch_1 = slim.conv2d(branch_1, 256, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_2'):
+               branch_2 = slim.conv2d(net, 24, [1,1], scope=Conv2d_0a_1x1)
+               branch_2 = slim.conv2d(branch_2, 64, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_3'):
+               branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
+               branch_3 = slim.conv2d(branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
             net = tf.concat(
-               axis=3, values=[Branch_0, Branch_1, Branch_2, Branch_3])
+               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
          end_points[end_point] = net
 
 
          end_point = 'Mixed_4e'
          with tf.variable_scope(end_point):
-            with tf.variable_scope('Branch_0'):
-               Branch_0 = slim.conv2d(net, 112, [1,1], scope=Conv2d_0a_1x1)
-            with tf.variable_scope('Branch_1'):
-               Branch_1 = slim.conv2d(net, 144, [1,1], scope=Conv2d_0a_1x1)
-               Branch_1 = slim.conv2d(Branch_1, 288, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_2'):
-               Branch_2 = slim.conv2d(net, 32, [1,1], scope=Conv2d_0a_1x1)
-               Branch_2 = slim.conv2d(Branch_2, 64, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_3'):
-               Branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
-               Branch_3 = slim.conv2d(Branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
+            with tf.variable_scope('branch_0'):
+               branch_0 = slim.conv2d(net, 112, [1,1], scope=Conv2d_0a_1x1)
+            with tf.variable_scope('branch_1'):
+               branch_1 = slim.conv2d(net, 144, [1,1], scope=Conv2d_0a_1x1)
+               branch_1 = slim.conv2d(branch_1, 288, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_2'):
+               branch_2 = slim.conv2d(net, 32, [1,1], scope=Conv2d_0a_1x1)
+               branch_2 = slim.conv2d(branch_2, 64, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_3'):
+               branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
+               branch_3 = slim.conv2d(branch_3, 64, [1,1], scope=Conv2d_0b_1x1)
             net = tf.concat(
-               axis=3, values=[Branch_0, Branch_1, Branch_2, Branch_3])
+               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
          end_points[end_point] = net
 
 
          end_point = 'Mixed_4f'
          with tf.variable_scope(end_point):
-            with tf.variable_scope('Branch_0'):
-               Branch_0 = slim.conv2d(net, 256, [1,1], scope=Conv2d_0a_1x1)
-            with tf.variable_scope('Branch_1'):
-               Branch_1 = slim.conv2d(net, 160, [1,1], scope=Conv2d_0a_1x1)
-               Branch_1 = slim.conv2d(Branch_1, 320, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_2'):
-               Branch_2 = slim.conv2d(net, 32, [1,1], scope=Conv2d_0a_1x1)
-               Branch_2 = slim.conv2d(Branch_2, 128, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_3'):
-               Branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
-               Branch_3 = slim.conv2d(Branch_3, 128, [1,1], scope=Conv2d_0b_1x1)
+            with tf.variable_scope('branch_0'):
+               branch_0 = slim.conv2d(net, 256, [1,1], scope=Conv2d_0a_1x1)
+            with tf.variable_scope('branch_1'):
+               branch_1 = slim.conv2d(net, 160, [1,1], scope=Conv2d_0a_1x1)
+               branch_1 = slim.conv2d(branch_1, 320, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_2'):
+               branch_2 = slim.conv2d(net, 32, [1,1], scope=Conv2d_0a_1x1)
+               branch_2 = slim.conv2d(branch_2, 128, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_3'):
+               branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
+               branch_3 = slim.conv2d(branch_3, 128, [1,1], scope=Conv2d_0b_1x1)
             net = tf.concat(
-               axis=3, values=[Branch_0, Branch_1, Branch_2, Branch_3])
+               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
          end_points[end_point] = net
 
 
          end_point = 'MaxPool_5a_2x2'
-         net = slim.max_pool2d(net, [2,2], stride=2, scope=end_point)
+         net = slim.max_pool2d(net, [3,3], stride=2, scope=end_point)
          end_points[end_point] = net
          
 
          end_point = 'Mixed_5b'
          with tf.variable_scope(end_point):
-            with tf.variable_scope('Branch_0'):
-               Branch_0 = slim.conv2d(net, 256, [1,1], scope=Conv2d_0a_1x1)
-            with tf.variable_scope('Branch_1'):
-               Branch_1 = slim.conv2d(net, 160, [1,1], scope=Conv2d_0a_1x1)
-               Branch_1 = slim.conv2d(Branch_1, 320, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_2'):
-               Branch_2 = slim.conv2d(net, 32, [1,1], scope=Conv2d_0a_1x1)
-               Branch_2 = slim.conv2d(Branch_2, 128, [3,3], scope=Conv2d_0a_3x3)
-            with tf.variable_scope('Branch_3'):
-               Branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
-               Branch_3 = slim.conv2d(Branch_3, 128, [1,1], scope=Conv2d_0b_1x1)
+            with tf.variable_scope('branch_0'):
+               branch_0 = slim.conv2d(net, 256, [1,1], scope=Conv2d_0a_1x1)
+            with tf.variable_scope('branch_1'):
+               branch_1 = slim.conv2d(net, 160, [1,1], scope=Conv2d_0a_1x1)
+               branch_1 = slim.conv2d(branch_1, 320, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_2'):
+               branch_2 = slim.conv2d(net, 32, [1,1], scope=Conv2d_0a_1x1)
+               branch_2 = slim.conv2d(branch_2, 128, [3,3], scope=Conv2d_0a_3x3)
+            with tf.variable_scope('branch_3'):
+               branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
+               branch_3 = slim.conv2d(branch_3, 128, [1,1], scope=Conv2d_0b_1x1)
             net = tf.concat(
-               axis=3, values=[Branch_0, Branch_1, Branch_2, Branch_3])
+               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
          end_points[end_point] = net
 
 
          end_point = 'Mixed_5c'
          with tf.variable_scope(end_point):
-            with tf.variable_scope('Branch_0'):
-               Branch_0 = slim.conv2d(net, 384, [1,1], scope=Conv2d_0a_1x1)
-            with tf.variable_scope('Branch_1'):
-               Branch_1 = slim.conv2d(net, 192, [1,1], scope=Conv2d_0a_1x1)
-               Branch_1 = slim.conv2d(Branch_1, 384, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_2'):
-               Branch_2 = slim.conv2d(net, 48, [1,1], scope=Conv2d_0a_1x1)
-               Branch_2 = slim.conv2d(Branch_2, 128, [3,3], scope=Conv2d_0b_3x3)
-            with tf.variable_scope('Branch_3'):
-               Branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
-               Branch_3 = slim.conv2d(Branch_3, 128, [1,1], scope=Conv2d_0b_1x1)
+            with tf.variable_scope('branch_0'):
+               branch_0 = slim.conv2d(net, 384, [1,1], scope=Conv2d_0a_1x1)
+            with tf.variable_scope('branch_1'):
+               branch_1 = slim.conv2d(net, 192, [1,1], scope=Conv2d_0a_1x1)
+               branch_1 = slim.conv2d(branch_1, 384, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_2'):
+               branch_2 = slim.conv2d(net, 48, [1,1], scope=Conv2d_0a_1x1)
+               branch_2 = slim.conv2d(branch_2, 128, [3,3], scope=Conv2d_0b_3x3)
+            with tf.variable_scope('branch_3'):
+               branch_3 = slim.max_pool2d(net, [3,3], scope=MaxPool_0a_3x3)
+               branch_3 = slim.conv2d(branch_3, 128, [1,1], scope=Conv2d_0b_1x1)
             net = tf.concat(
-               axis=3, values=[Branch_0, Branch_1, Branch_2, Branch_3])
+               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
          end_points[end_point] = net
 
 
          end_point = 'AvgPool_0a_7x7'
-         net = slim.avg_pool2d(net, [7,7], stride=1, scope=end_point)
+         net = slim.avg_pool2d(net, [0,0], stride=1, scope=end_point)
          end_points[end_point] = net
          
 
