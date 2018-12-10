@@ -60,7 +60,7 @@ int find_class(caffe::NetParameter param)
 	for (int nlayers=0; nlayers < param.layer_size(); nlayers++) 
 	{
 		lparam = param.layer(nlayers);
-		if(lparam.name()=="Logits/Conv2d_0c_1x1")
+		if(lparam.type()=="Convolution" && lparam.bottom()[0]==lparam.top()[0] && lparam.bottom()[0]=="logits")
 			return lparam.convolution_param().num_output();
 	}
 	return 1000;

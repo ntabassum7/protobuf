@@ -216,7 +216,7 @@ def InceptionV1(inputs,
 
 
          end_point = 'AvgPool_0a_7x7'
-         net = slim.avg_pool2d(net, [0,0], stride=1, scope=end_point)
+         net = slim.avg_pool2d(net, [7,7], stride=1, scope=end_point)
          end_points[end_point] = net
          
 
