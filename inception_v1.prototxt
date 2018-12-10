@@ -2904,6 +2904,7 @@ layer {
   top: "AvgPool_0a_7x7"
   pooling_param {
     pool: AVE
+    kernel_size: 7
     global_pooling: true
   }
 }
