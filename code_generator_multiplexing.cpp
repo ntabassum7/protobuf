@@ -373,7 +373,8 @@ int main() {
 					{		
 						axis= 0;
 						values = "values=[branch_"+ std::to_string(axis);
-						b_num=ep_send=current_branch="branch_"+ std::to_string(axis);
+						ep_send=current_branch="Branch_"+ std::to_string(axis);
+						b_num="branch_"+std::to_string(axis);
 						end_point = "end_point = \'"+br_concat+"\'";	
 						target<<space<< end_point<<endl;	
 
@@ -394,7 +395,8 @@ int main() {
 						ep_send="net";
 						if (axis>0)
 							values = values + ", branch_" + std::to_string(axis);
-						b_num=current_branch = "branch_"+std::to_string(axis);
+						current_branch = "Branch_"+std::to_string(axis);
+						b_num="branch_"+std::to_string(axis);
 						target<<space<< "with tf.variable_scope(\'"+current_branch+"\'):"<<endl;
 						axis++;
 					}
