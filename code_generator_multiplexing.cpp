@@ -70,9 +70,6 @@ int find_class(caffe::NetParameter param)
 //used to print general layers
 void general(caffe::LayerParameter lparam, int ind, string ep)
 {
-	if((lparam.type() == "BatchNorm")||(lparam.type() == "Scale") || (lparam.type() == "ReLU"))
-		return;
-
 	string conv_name,end_point,net, slim, conv_dim;
 	string space =indent(ind);
 
@@ -110,10 +107,8 @@ void general(caffe::LayerParameter lparam, int ind, string ep)
 }
 
 //used to print mixed layers
-void mixed(caffe::LayerParameter lparam, int ind, string ep, string b_num, string select)
+void mixed(caffe::LayerParameter lparam, int ind, string ep, string b_num, string select, string close)
 {
-	if((lparam.type() == "BatchNorm")||(lparam.type() == "Scale") || (lparam.type() == "ReLU"))
-		return;
 	string end_point, net, conv_dim, name=lparam.name();
 	string space =indent(ind);
 	std::vector<std::string> result;
@@ -130,18 +125,18 @@ void mixed(caffe::LayerParameter lparam, int ind, string ep, string b_num, strin
 		int stride =lparam.convolution_param().stride()[0];
 		conv_dim = std::to_string(lparam.convolution_param().kernel_size()[0]);
 		if (stride>1)		
-			net = b_num+" = slim.conv2d("+ep+", "+select+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope="+name+")";
+			net = b_num+" = slim.conv2d("+ep+", "+select+std::to_string(output)+close+", "+"["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope=\'"+name+"\')";
 		else
-			net = b_num+" = slim.conv2d("+ep+", "+select+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], scope="+name+")";
+			net = b_num+" = slim.conv2d("+ep+", "+select+std::to_string(output)+close+", "+"["+conv_dim+","+conv_dim+"], scope=\'"+name+"\')";
 	}
 	if (lparam.has_pooling_param())
 	{
 		conv_dim = std::to_string(lparam.pooling_param().kernel_size());
 		int stride =lparam.pooling_param().stride();
 		if (stride>1)		
-			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope="+name+")";
+			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope=\'"+name+"\')";
 		else
-			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], scope="+name+")";
+			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], scope=\'"+name+"\')";
 	} 
 	target<<space<<net<<endl;	
 
@@ -355,7 +350,7 @@ int main() {
 
 			else if (branch==1)
 			{
-				string end_point, ep_send, current_branch, b_num, select;
+				string end_point, ep_send, current_branch, b_num, select, close;
 				std::vector<std::string> result;
 				if (lparam.type()=="Concat")
 				{
@@ -392,7 +387,10 @@ int main() {
 					{
 						//changed for multiplexing code
 						if (previous_endpoint.size()!= 0 && previous_endpoint == br_concat)
+						{
 							select="selectdepth(end_point,";
+							close=")";
+						}
 						ep_send="net";
 						if (axis>0)
 							values = values + ", branch_" + std::to_string(axis);
@@ -400,7 +398,7 @@ int main() {
 						target<<space<< "with tf.variable_scope(\'"+current_branch+"\'):"<<endl;
 						axis++;
 					}
-					mixed(lparam,ind+1,ep_send,b_num,select);
+					mixed(lparam,ind+1,ep_send,b_num,select, close);
 					previous_endpoint = br_concat;
 					oldparam = lparam;
 				}	

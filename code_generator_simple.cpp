@@ -70,9 +70,6 @@ int find_class(caffe::NetParameter param)
 //used to print general layers
 void general(caffe::LayerParameter lparam, int ind, string ep)
 {
-	if((lparam.type() == "BatchNorm")||(lparam.type() == "Scale") || (lparam.type() == "ReLU"))
-		return;
-
 	string conv_name,end_point,net, slim, conv_dim;
 	string space =indent(ind);
 
@@ -112,8 +109,6 @@ void general(caffe::LayerParameter lparam, int ind, string ep)
 //used to print mixed layers
 void mixed(caffe::LayerParameter lparam, int ind, string ep, string b_num)
 {
-	if((lparam.type() == "BatchNorm")||(lparam.type() == "Scale") || (lparam.type() == "ReLU"))
-		return;
 	string end_point, net, conv_dim, name=lparam.name();
 	string space =indent(ind);
 	std::vector<std::string> result;
@@ -130,18 +125,18 @@ void mixed(caffe::LayerParameter lparam, int ind, string ep, string b_num)
 		int stride =lparam.convolution_param().stride()[0];
 		conv_dim = std::to_string(lparam.convolution_param().kernel_size()[0]);
 		if (stride>1)		
-			net = b_num+" = slim.conv2d("+ep+", "+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope="+name+")";
+			net = b_num+" = slim.conv2d("+ep+", "+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope=\'"+name+"\')";
 		else
-			net = b_num+" = slim.conv2d("+ep+", "+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], scope="+name+")";
+			net = b_num+" = slim.conv2d("+ep+", "+std::to_string(output)+", "+"["+conv_dim+","+conv_dim+"], scope=\'"+name+"\')";
 	}
 	if (lparam.has_pooling_param())
 	{
 		conv_dim = std::to_string(lparam.pooling_param().kernel_size());
 		int stride =lparam.pooling_param().stride();
 		if (stride>1)		
-			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope="+name+")";
+			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], stride="+std::to_string(stride)+", scope=\'"+name+"\')";
 		else
-			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], scope="+name+")";
+			net = b_num+" = slim.max_pool2d("+ep+", ["+conv_dim+","+conv_dim+"], scope=\'"+name+"\')";
 	} 
 	target<<space<<net<<endl;	
 
