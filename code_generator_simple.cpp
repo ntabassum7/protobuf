@@ -340,7 +340,6 @@ int main() {
 			else if (branch==1)
 			{
 				string end_point, ep_send, current_branch, b_num;
-				std::vector<std::string> result;
 				if (lparam.type()=="Concat")
 				{
 					br_concat="";
@@ -356,7 +355,6 @@ int main() {
 				{
 					if (br_concat.empty())
 						br_concat=find_concat(param, nlayers, lparam.name());
-					result=split(lparam.name(),"/");
 					b_num=ep_send="branch_"+ std::to_string(axis-1);
 					if (previous_endpoint.empty() || previous_endpoint != br_concat)
 					{		
