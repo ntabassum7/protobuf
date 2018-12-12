@@ -25,7 +25,8 @@ using google::protobuf::io::CodedOutputStream;
 using google::protobuf::Message;
 
 //target file
-ofstream target ("inception_v1_multiplexing.py");
+std::ofstream target;
+
 
 //used to split a string into tokens depending on delimiter
 vector<string> split(string str, string token){
@@ -272,15 +273,30 @@ string find_concat(caffe::NetParameter param, int nlayers, string name)
 	return name;
 }
 
-int main() {
-	  caffe::NetParameter param;
-	  caffe::LayerParameter lparam, oldparam;
-	  const char * filename = "inception_v1.prototxt";
-	  int fd = open(filename, O_RDONLY);
-	  if (fd == -1)
-	  cout << "File not found: " << filename;
-	  google::protobuf::io::FileInputStream* input = new google::protobuf::io::FileInputStream(fd);
-	  bool success = google::protobuf::TextFormat::Parse(input, &param);
+int main(int argc, char** argv) {
+
+	string inputFile = "";
+	const char * filename;
+
+	if( argc == 3 ) 
+	{
+		filename = argv[1];
+		target.open(argv[2]);
+	}
+	else
+	{
+		cout<<"Filenames are missing"<<endl;
+		return 1;
+	}
+
+	caffe::NetParameter param;
+	caffe::LayerParameter lparam, oldparam;
+
+	int fd = open(filename, O_RDONLY);
+	if (fd == -1)
+	cout << "File not found: " << filename;
+	google::protobuf::io::FileInputStream* input = new google::protobuf::io::FileInputStream(fd);
+	bool success = google::protobuf::TextFormat::Parse(input, &param);
 
 	int ind=0, axis=0, j, branch=0, num_classes;
 	std::string oldbottom, previous_endpoint, previous_branch, values, gen_ep, br_concat;
