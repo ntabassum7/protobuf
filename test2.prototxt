@@ -1,0 +1,115 @@
+name: "InceptionV1"
+input: "inputs"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 224 
+  dim: 224
+}
+layer {
+  name: "Conv2d_1a_7x7"
+  type: "Convolution"
+  bottom: "inputs"
+  top: "Conv2d_1a_7x7"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    bias_term: false
+    kernel_size: 7
+    stride: 2
+    weight_filler {
+      type: "xavier"
+      std: 0.01
+    }
+  }
+}
+layer {
+  name: "Conv2d_1a_7x7_bn"
+  type: "BatchNorm"
+  bottom: "Conv2d_1a_7x7"
+  top: "Conv2d_1a_7x7"
+  batch_norm_param {
+    use_global_stats: true
+    eps: 0.001
+  }
+}
+layer {
+  name: "Conv2d_1a_7x7_scale"
+  type: "Scale"
+  bottom: "Conv2d_1a_7x7"
+  top: "Conv2d_1a_7x7"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "Conv2d_1a_7x7_relu"
+  type: "ReLU"
+  bottom: "Conv2d_1a_7x7"
+  top: "Conv2d_1a_7x7"
+}
+
+layer {
+  name: "MaxPool_2a_3x3"
+  type: "Pooling"
+  bottom: "Conv2d_1a_7x7"
+  top: "MaxPool_2a_3x3"
+  pooling_param {
+    pool: MAX
+    stride: 2
+  }
+}
+layer {
+  name: "Logits/Dropout_0b"
+  type: "Dropout"
+  bottom: "MaxPool_2a_3x3"
+  top: "logits"
+  dropout_param {
+    dropout_ratio: 0.2
+  }
+}
+
+layer {
+  name: "Logits/Conv2d_0c_1x1"
+  type: "Convolution"
+  bottom: "logits"
+  top: "logits"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    bias_term: true
+    num_output: 1000
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+      std: 0.01
+    }
+  }
+}
+
+layer {
+  name: "Logits/reshape"
+  type: "Reshape"
+  bottom: "logits"
+  top: "logits"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 0
+    }
+  }
+}
+
+layer {
+  name: "Predictions"
+  type: "Softmax"
+  bottom: "logits"
+  top: "Predictions"
+}
+
